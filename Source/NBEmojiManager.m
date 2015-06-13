@@ -57,10 +57,15 @@
 
 - (void)searchWithText:(NSString *)searchText
 {
-    NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NBEmoji *evaluatedObject, NSDictionary *bindings) {
-        return [[evaluatedObject.name lowercaseString] containsString:[searchText lowercaseString]];
-    }];
-    self.searchedEmoji = [self.allEmoji filteredArrayUsingPredicate:predicate];
+    if (searchText.length == 0) {
+        self.searchedEmoji = nil;
+    } else {
+        NSPredicate *predicate = [NSPredicate predicateWithBlock:^BOOL(NBEmoji *evaluatedObject, NSDictionary *bindings) {
+            return ([[evaluatedObject.name lowercaseString] containsString:[searchText lowercaseString]] ||
+                    [[evaluatedObject.emoji lowercaseString] containsString:[searchText lowercaseString]]);
+        }];
+        self.searchedEmoji = [self.allEmoji filteredArrayUsingPredicate:predicate];
+    }
 }
 
 #pragma mark - Data Source

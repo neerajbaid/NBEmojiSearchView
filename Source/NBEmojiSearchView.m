@@ -17,7 +17,6 @@
     if (self) {
         [self addSubview:self.tableView];
         self.rowHeight = 44.0;
-        self.headerTitle = @"Type to search";
     }
     return self;
 }
