@@ -133,42 +133,30 @@ shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string
 {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
-    if ([string isEqualToString:@" "] ||
-        newString.length == 0) {
+    NSRange colonRange = [newString rangeOfString:@":"
+                                          options:NSBackwardsSearch
+                                            range:NSMakeRange(0, range.location + string.length)];
+    NSRange spaceRange = [newString rangeOfString:@" "
+                                          options:NSBackwardsSearch
+                                            range:NSMakeRange(0, range.location + string.length)];
+    if (colonRange.location == NSNotFound) {
         [self disappear];
-    } else if ([string isEqualToString:@":"]) {
-        if (newString.length == 1) {
-            [self appear];
-        } else if (newString.length > 1 &&
-                   [[newString substringWithRange:NSMakeRange(range.location - 1, 1)] isEqualToString:@" "]) {
-            [self appear];
-        }
-    } else {
-        NSRange colonRange = [newString rangeOfString:@":"
-                                              options:NSBackwardsSearch
-                                                range:NSMakeRange(0, range.location)];
+    } else if (spaceRange.location == NSNotFound || colonRange.location > spaceRange.location) {
+        NSUInteger searchLength = newString.length - colonRange.location - 1;
         NSRange spaceRange = [newString rangeOfString:@" "
-                                              options:NSBackwardsSearch
-                                                range:NSMakeRange(0, range.location)];
-        if (colonRange.location == NSNotFound) {
-            [self disappear];
-        } else if (spaceRange.location == NSNotFound || colonRange.location > spaceRange.location) {
-            NSUInteger searchLength = newString.length - colonRange.location - 1;
-            NSRange spaceRange = [newString rangeOfString:@" "
-                                                  options:NSCaseInsensitiveSearch
-                                                    range:NSMakeRange(colonRange.location + 1, searchLength)];
-            NSString *searchText;
-            if (spaceRange.location == NSNotFound) {
-                searchText = [newString substringFromIndex:colonRange.location + 1];
-            } else {
-                searchText = [newString substringWithRange:NSMakeRange(colonRange.location + 1,
-                                                                       spaceRange.location - colonRange.location - 1)];
-            }
-            self.currentSearchRange = NSMakeRange(colonRange.location + 1, searchText.length);
-            [self searchWithText:searchText];
+                                              options:NSCaseInsensitiveSearch
+                                                range:NSMakeRange(colonRange.location + 1, searchLength)];
+        NSString *searchText;
+        if (spaceRange.location == NSNotFound) {
+            searchText = [newString substringFromIndex:colonRange.location + 1];
         } else {
-            [self disappear];
+            searchText = [newString substringWithRange:NSMakeRange(colonRange.location + 1,
+                                                                   spaceRange.location - colonRange.location - 1)];
         }
+        self.currentSearchRange = NSMakeRange(colonRange.location + 1, searchText.length);
+        [self searchWithText:searchText];
+    } else {
+        [self disappear];
     }
     if ([self.delegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
         return [self.delegate performSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)
