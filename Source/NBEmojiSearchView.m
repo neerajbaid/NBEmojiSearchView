@@ -70,9 +70,13 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     NSInteger numberOfRows = [self.manager numberOfSearchResults];
-    if (numberOfRows == 0) {
-        [self disappear];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (numberOfRows == 0) {
+            [self disappear];
+        } else {
+            [self appear];
+        }
+    });
     return numberOfRows;
 }
 
@@ -153,7 +157,6 @@ replacementString:(NSString *)string
                 }
                 NSString *searchText = [newString substringWithRange:NSMakeRange(startingIndex, length)];
                 [self searchWithText:searchText];
-                [self appear];
                 break;
             }
         }
