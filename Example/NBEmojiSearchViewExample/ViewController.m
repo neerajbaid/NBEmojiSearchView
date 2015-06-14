@@ -12,24 +12,33 @@
 @interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet UITextField *textField;
-@property (nonatomic, strong) NBEmojiSearchView *searchView;
+@property (nonatomic, strong) NBEmojiSearchView *emojiSearchView;
 
 @end
 
 @implementation ViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
-    self.searchView = [[NBEmojiSearchView alloc] init];
-    self.searchView.frame = CGRectMake(0, 60, self.view.frame.size.width, 300);
-    [self.view addSubview:self.searchView];
-    [self.searchView installOnTextField:self.textField delegate:self];
+    [self.view addSubview:self.emojiSearchView];
+    [self.emojiSearchView installOnTextField:self.textField delegate:self];
 }
 
-- (void)emojiSearchView:(NBEmojiSearchView *)emojiSearchView didSelectEmoji:(NBEmoji *)emoji
+- (void)viewWillAppear:(BOOL)animated
 {
-    NSString *stringToAppend = [NSString stringWithFormat:@"%@ ", emoji.emoji];
-    self.textField.text = [self.textField.text stringByAppendingString:stringToAppend];
+    [super viewWillAppear:animated];
+    
+    [self.textField becomeFirstResponder];
+}
+
+- (NBEmojiSearchView *)emojiSearchView
+{
+    if (!_emojiSearchView) {
+        _emojiSearchView = [[NBEmojiSearchView alloc] init];
+        _emojiSearchView.frame = CGRectMake(0, 46, self.view.frame.size.width, 364);
+    }
+    return _emojiSearchView;
 }
 
 @end

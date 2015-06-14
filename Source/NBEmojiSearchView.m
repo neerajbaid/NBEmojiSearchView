@@ -4,9 +4,11 @@
 
 @interface NBEmojiSearchView () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
 
-@property (nonatomic, strong) id delegate;
 @property (nonatomic, strong) UITextField *textField;
 @property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) UIView *dividerView;
+
+@property (nonatomic, strong) id delegate;
 @property (nonatomic, strong) NBEmojiManager *manager;
 @property (nonatomic) NSRange currentSearchRange;
 
@@ -19,8 +21,11 @@
     self = [super init];
     if (self) {
         [self addSubview:self.tableView];
+        [self addSubview:self.dividerView];
         self.rowHeight = 44.0;
         self.alpha = 0.0;
+        self.font = [UIFont systemFontOfSize:17.0];
+        self.textColor = [UIColor darkTextColor];
     }
     return self;
 }
@@ -71,6 +76,16 @@
     return _tableView;
 }
 
+- (UIView *)dividerView
+{
+    if (!_dividerView) {
+        _dividerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.5)];
+        _dividerView.backgroundColor = [UIColor colorWithWhite:205.0/255.0 alpha:1.0];
+        _dividerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    }
+    return _dividerView;
+}
+
 #pragma mark - UITableView(DataSource|Delegate)
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -84,6 +99,8 @@
     NBEmojiSearchResultTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:identifier
                                                                                   forIndexPath:indexPath];
     cell.emoji = [self.manager emojiAtIndex:indexPath.row];
+    cell.textLabel.font = self.font;
+    cell.textLabel.textColor = self.textColor;
     return cell;
 }
 
