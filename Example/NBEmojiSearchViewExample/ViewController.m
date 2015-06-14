@@ -9,7 +9,7 @@
 #import "NBEmojiSearchView.h"
 #import "ViewController.h"
 
-@interface ViewController () <UITextFieldDelegate, NBEmojiSearchViewDelegate>
+@interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (nonatomic, strong) NBEmojiSearchView *searchView;

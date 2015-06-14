@@ -4,7 +4,7 @@
 
 @interface NBEmojiSearchView () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
 
-@property (nonatomic, strong) id<NBEmojiSearchViewDelegate> delegate;
+@property (nonatomic, strong) id delegate;
 @property (nonatomic, strong) UITextField *textField;
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NBEmojiManager *manager;
@@ -33,7 +33,7 @@
 }
 
 - (void)installOnTextField:(UITextField *)textField
-                  delegate:(id<NBEmojiSearchViewDelegate>)delegate
+                  delegate:(id)delegate
 {
     self.delegate = delegate;
     self.textField = textField;
@@ -69,7 +69,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [self.manager numberOfSearchResults];
+    NSInteger numberOfRows = [self.manager numberOfSearchResults];
+    if (numberOfRows == 0) {
+        [self disappear];
+    }
+    return numberOfRows;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -83,9 +87,6 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ([self.delegate respondsToSelector:@selector(emojiSearchView:didSelectEmoji:)]) {
-        [self.delegate emojiSearchView:self didSelectEmoji:[self.manager emojiAtIndex:indexPath.row]];
-    }
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     [self disappear];
     [self.manager clear];
@@ -123,13 +124,38 @@ shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string
 {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
-    if ([string isEqualToString:@" "]) {
+    if ([string isEqualToString:@" "] ||
+        newString.length == 0) {
         [self disappear];
     } else if ([string isEqualToString:@":"]) {
-        if (range.location == 0) {
+        if (newString.length == 1) {
             [self appear];
-        } else if ([[newString substringWithRange:NSMakeRange(range.location - 1, 1)] isEqualToString:@" "]) {
+        } else if (newString.length > 1 &&
+                   [[newString substringWithRange:NSMakeRange(range.location - 1, 1)] isEqualToString:@" "]) {
             [self appear];
+        }
+    } else {
+        NSString *beforeString = [newString substringToIndex:range.location];
+        for (NSInteger i = beforeString.length - 1; i >= 0; i--) {
+            NSString *character = [beforeString substringWithRange:NSMakeRange(i, 1)];
+            if ([character isEqualToString:@" "]) {
+                [self disappear];
+                break;
+            } else if ([character isEqualToString:@":"]) {
+                NSInteger startingIndex = i + 1;
+                NSUInteger length = 0;
+                for (NSInteger j = startingIndex; j < newString.length; j++) {
+                    character = [newString substringWithRange:NSMakeRange(j, 1)];
+                    if ([character isEqualToString:@" "]) {
+                        break;
+                    }
+                    length++;
+                }
+                NSString *searchText = [newString substringWithRange:NSMakeRange(startingIndex, length)];
+                [self searchWithText:searchText];
+                [self appear];
+                break;
+            }
         }
     }
     if ([self.delegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
@@ -185,6 +211,7 @@ replacementString:(NSString *)string
 
 - (void)disappear
 {
+    [self.manager clear];
     self.alpha = 0.0;
 }
 
