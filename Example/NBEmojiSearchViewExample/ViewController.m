@@ -36,7 +36,7 @@
 {
     if (!_emojiSearchView) {
         _emojiSearchView = [[NBEmojiSearchView alloc] init];
-        _emojiSearchView.frame = CGRectMake(0, 46, self.view.frame.size.width, 364);
+        _emojiSearchView.frame = CGRectMake(0, 46, self.view.frame.size.width, 405);
     }
     return _emojiSearchView;
 }
