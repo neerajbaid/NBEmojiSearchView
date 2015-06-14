@@ -46,10 +46,17 @@
                                                                     options:NSJSONReadingAllowFragments
                                                                       error:nil];
     for (NSString *name in emojiDictionary) {
-        self.allEmoji = [self.allEmoji arrayByAddingObject:[[NBEmoji alloc] initWithName:name emoji:emojiDictionary[name]]];
+        self.allEmoji = [self.allEmoji arrayByAddingObject:
+                         [[NBEmoji alloc] initWithName:name
+                                                 emoji:emojiDictionary[name]]];
     }
+    self.allEmoji = [self.allEmoji sortedArrayUsingComparator:^NSComparisonResult(NBEmoji *obj1, NBEmoji *obj2) {
+        return [obj1.name compare:obj2.name];
+    }];
     for (NSString *name in [self topEmojiList]) {
-        self.topEmoji = [self.topEmoji arrayByAddingObject:[[NBEmoji alloc] initWithName:name emoji:emojiDictionary[name]]];
+        self.topEmoji = [self.topEmoji arrayByAddingObject:
+                         [[NBEmoji alloc] initWithName:name
+                                                 emoji:emojiDictionary[name]]];
     }
 }
 
