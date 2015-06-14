@@ -8,6 +8,7 @@
 @property (nonatomic, strong) UITextField *textField;
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) NBEmojiManager *manager;
+@property (nonatomic) NSRange currentSearchRange;
 
 @end
 
@@ -91,7 +92,11 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    NSString *replacementString = [NSString stringWithFormat:@"%@ ", [self.manager emojiAtIndex:indexPath.row].emoji];
+    NSRange extendedRange = NSMakeRange(self.currentSearchRange.location - 1, self.currentSearchRange.length + 1);
+    self.textField.text = [self.textField.text stringByReplacingCharactersInRange:extendedRange
+                                                                       withString:replacementString];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self disappear];
     [self.manager clear];
     [self.tableView reloadData];
@@ -155,7 +160,8 @@ replacementString:(NSString *)string
                     }
                     length++;
                 }
-                NSString *searchText = [newString substringWithRange:NSMakeRange(startingIndex, length)];
+                self.currentSearchRange = NSMakeRange(startingIndex, length);
+                NSString *searchText = [newString substringWithRange:self.currentSearchRange];
                 [self searchWithText:searchText];
                 break;
             }
@@ -215,6 +221,7 @@ replacementString:(NSString *)string
 - (void)disappear
 {
     [self.manager clear];
+    self.currentSearchRange = NSMakeRange(0, 0);
     self.alpha = 0.0;
 }
 
