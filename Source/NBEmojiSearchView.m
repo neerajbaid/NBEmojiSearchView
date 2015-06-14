@@ -30,7 +30,12 @@
 - (void)searchWithText:(NSString *)searchText
 {
     [self.manager searchWithText:searchText];
-    [self.tableView reloadData];
+    if ([self.manager numberOfSearchResults] == 0) {
+        [self disappear];
+    } else {
+        [self.tableView reloadData];
+        [self appear];
+    }
 }
 
 - (void)installOnTextField:(UITextField *)textField
@@ -70,15 +75,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSInteger numberOfRows = [self.manager numberOfSearchResults];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (numberOfRows == 0) {
-            [self disappear];
-        } else {
-            [self appear];
-        }
-    });
-    return numberOfRows;
+    return [self.manager numberOfSearchResults];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -96,8 +93,8 @@
     NSRange extendedRange = NSMakeRange(self.currentSearchRange.location - 1, self.currentSearchRange.length + 1);
     self.textField.text = [self.textField.text stringByReplacingCharactersInRange:extendedRange
                                                                        withString:replacementString];
-    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self disappear];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.manager clear];
     [self.tableView reloadData];
 }
