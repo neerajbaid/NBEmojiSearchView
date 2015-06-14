@@ -144,27 +144,30 @@ replacementString:(NSString *)string
             [self appear];
         }
     } else {
-        NSString *beforeString = [newString substringToIndex:range.location];
-        for (NSInteger i = beforeString.length - 1; i >= 0; i--) {
-            NSString *character = [beforeString substringWithRange:NSMakeRange(i, 1)];
-            if ([character isEqualToString:@" "]) {
-                [self disappear];
-                break;
-            } else if ([character isEqualToString:@":"]) {
-                NSInteger startingIndex = i + 1;
-                NSUInteger length = 0;
-                for (NSInteger j = startingIndex; j < newString.length; j++) {
-                    character = [newString substringWithRange:NSMakeRange(j, 1)];
-                    if ([character isEqualToString:@" "]) {
-                        break;
-                    }
-                    length++;
-                }
-                self.currentSearchRange = NSMakeRange(startingIndex, length);
-                NSString *searchText = [newString substringWithRange:self.currentSearchRange];
-                [self searchWithText:searchText];
-                break;
+        NSRange colonRange = [newString rangeOfString:@":"
+                                              options:NSBackwardsSearch
+                                                range:NSMakeRange(0, range.location)];
+        NSRange spaceRange = [newString rangeOfString:@" "
+                                              options:NSBackwardsSearch
+                                                range:NSMakeRange(0, range.location)];
+        if (colonRange.location == NSNotFound) {
+            [self disappear];
+        } else if (spaceRange.location == NSNotFound || colonRange.location > spaceRange.location) {
+            NSUInteger searchLength = newString.length - colonRange.location - 1;
+            NSRange spaceRange = [newString rangeOfString:@" "
+                                                  options:NSCaseInsensitiveSearch
+                                                    range:NSMakeRange(colonRange.location + 1, searchLength)];
+            NSString *searchText;
+            if (spaceRange.location == NSNotFound) {
+                searchText = [newString substringFromIndex:colonRange.location + 1];
+            } else {
+                searchText = [newString substringWithRange:NSMakeRange(colonRange.location + 1,
+                                                                       spaceRange.location - colonRange.location - 1)];
             }
+            self.currentSearchRange = NSMakeRange(colonRange.location + 1, searchText.length);
+            [self searchWithText:searchText];
+        } else {
+            [self disappear];
         }
     }
     if ([self.delegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
