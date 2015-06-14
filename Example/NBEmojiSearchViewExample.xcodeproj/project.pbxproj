@@ -137,14 +137,14 @@
 		07A7686B1B2CC163005713A6 /* NBEmojiSearchView */ = {
 			isa = PBXGroup;
 			children = (
+				078D6C771B2CC94200BF4223 /* NBEmojiSearchView.h */,
+				078D6C781B2CC94200BF4223 /* NBEmojiSearchView.m */,
 				078D6C711B2CC94200BF4223 /* NBEmoji.h */,
 				078D6C721B2CC94200BF4223 /* NBEmoji.m */,
 				078D6C731B2CC94200BF4223 /* NBEmojiManager.h */,
 				078D6C741B2CC94200BF4223 /* NBEmojiManager.m */,
 				078D6C751B2CC94200BF4223 /* NBEmojiSearchResultTableViewCell.h */,
 				078D6C761B2CC94200BF4223 /* NBEmojiSearchResultTableViewCell.m */,
-				078D6C771B2CC94200BF4223 /* NBEmojiSearchView.h */,
-				078D6C781B2CC94200BF4223 /* NBEmojiSearchView.m */,
 				078D6C7D1B2CCB4000BF4223 /* AllEmoji.json */,
 			);
 			name = NBEmojiSearchView;

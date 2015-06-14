@@ -14,11 +14,11 @@
 
 @interface NBEmojiSearchView : UIView
 
-@property (nonatomic, strong) id<NBEmojiSearchViewDelegate> delegate;
-
 @property (nonatomic) CGFloat rowHeight;
 @property (nonatomic, strong) NSString *headerTitle;
 
 - (void)searchWithText:(NSString *)searchText;
+- (void)installOnTextField:(UITextField *)textField
+                  delegate:(id<NBEmojiSearchViewDelegate>)delegate;
 
 @end
