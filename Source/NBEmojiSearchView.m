@@ -86,6 +86,20 @@
     return _dividerView;
 }
 
+#pragma mark - View
+
+- (void)appear
+{
+    self.alpha = 1.0;
+}
+
+- (void)disappear
+{
+    [self.manager clear];
+    self.currentSearchRange = NSMakeRange(0, 0);
+    self.alpha = 0.0;
+}
+
 #pragma mark - UITableView(DataSource|Delegate)
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -147,25 +161,20 @@ shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string
 {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
-    NSRange colonRange = [newString rangeOfString:@":"
-                                          options:NSBackwardsSearch
-                                            range:NSMakeRange(0, range.location + string.length)];
-    NSRange spaceRange = [newString rangeOfString:@" "
-                                          options:NSBackwardsSearch
-                                            range:NSMakeRange(0, range.location + string.length)];
+    NSInteger searchLength = range.location + string.length;
+    NSRange colonRange = [newString rangeOfString:@":" options:NSBackwardsSearch range:NSMakeRange(0, searchLength)];
+    NSRange spaceRange = [newString rangeOfString:@" " options:NSBackwardsSearch range:NSMakeRange(0, searchLength)];
     if (colonRange.location == NSNotFound) {
         [self disappear];
     } else if (spaceRange.location == NSNotFound || colonRange.location > spaceRange.location) {
-        NSUInteger searchLength = newString.length - colonRange.location - 1;
-        NSRange spaceRange = [newString rangeOfString:@" "
-                                              options:NSCaseInsensitiveSearch
-                                                range:NSMakeRange(colonRange.location + 1, searchLength)];
+        NSRange searchRange = NSMakeRange(colonRange.location + 1, newString.length - colonRange.location - 1);
+        NSRange spaceRange = [newString rangeOfString:@" " options:NSCaseInsensitiveSearch range:searchRange];
         NSString *searchText;
         if (spaceRange.location == NSNotFound) {
             searchText = [newString substringFromIndex:colonRange.location + 1];
         } else {
-            searchText = [newString substringWithRange:NSMakeRange(colonRange.location + 1,
-                                                                   spaceRange.location - colonRange.location - 1)];
+            NSRange stringRange = NSMakeRange(colonRange.location + 1, spaceRange.location - colonRange.location - 1);
+            searchText = [newString substringWithRange:stringRange];
         }
         self.currentSearchRange = NSMakeRange(colonRange.location + 1, searchText.length);
         [self searchWithText:searchText];
@@ -214,20 +223,6 @@ replacementString:(NSString *)string
     } else {
         return YES;
     }
-}
-
-#pragma mark - View
-
-- (void)appear
-{
-    self.alpha = 1.0;
-}
-
-- (void)disappear
-{
-    [self.manager clear];
-    self.currentSearchRange = NSMakeRange(0, 0);
-    self.alpha = 0.0;
 }
 
 @end
