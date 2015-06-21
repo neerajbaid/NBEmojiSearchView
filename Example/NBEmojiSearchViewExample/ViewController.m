@@ -13,14 +13,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
     [self.view addSubview:self.emojiSearchView];
-    [self.emojiSearchView installOnTextField:self.textField delegate:self];
+    [self registerForKeyboardNotifications];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
     [self.textField becomeFirstResponder];
 }
 
@@ -28,9 +29,22 @@
 {
     if (!_emojiSearchView) {
         _emojiSearchView = [[NBEmojiSearchView alloc] init];
-        _emojiSearchView.frame = CGRectMake(0, 46, self.view.frame.size.width, 405);
+        _emojiSearchView.frame = CGRectMake(0, 46.0, self.view.frame.size.width, self.view.frame.size.height - 46.0);
+        [_emojiSearchView installOnTextField:self.textField];
     }
     return _emojiSearchView;
+}
+
+- (void)registerForKeyboardNotifications
+{
+    [[NSNotificationCenter defaultCenter]
+     addObserverForName:UIKeyboardWillChangeFrameNotification
+     object:nil
+     queue:[NSOperationQueue mainQueue]
+     usingBlock:^(NSNotification * __nonnull note) {
+         CGRect keyboardFrame = [note.userInfo[UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+         self.emojiSearchView.tableView.contentInset = UIEdgeInsetsMake(0.0, 0.0, keyboardFrame.size.height, 0.0);
+     }];
 }
 
 @end

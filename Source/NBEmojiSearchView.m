@@ -5,10 +5,9 @@
 @interface NBEmojiSearchView () <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate>
 
 @property (nonatomic, strong) UITextField *textField;
-@property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIView *dividerView;
 
-@property (nonatomic, strong) id delegate;
+@property (nonatomic, strong) id<UITextFieldDelegate> delegate;
 @property (nonatomic, strong) NBEmojiManager *manager;
 @property (nonatomic) NSRange currentSearchRange;
 
@@ -44,9 +43,8 @@
 }
 
 - (void)installOnTextField:(UITextField *)textField
-                  delegate:(id)delegate
 {
-    self.delegate = delegate;
+    self.delegate = textField.delegate;
     self.textField = textField;
     self.textField.delegate = self;
 }
@@ -72,6 +70,7 @@
                                        UIViewAutoresizingFlexibleHeight);
         [_tableView registerClass:[NBEmojiSearchResultTableViewCell class]
            forCellReuseIdentifier:NSStringFromClass([NBEmojiSearchResultTableViewCell class])];
+        _tableView.showsVerticalScrollIndicator = NO;
     }
     return _tableView;
 }
@@ -145,14 +144,14 @@
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
     if ([self.delegate respondsToSelector:@selector(textFieldDidBeginEditing:)]) {
-        [self.delegate performSelector:@selector(textFieldDidBeginEditing:) withObject:textField];
+        [self.delegate textFieldDidBeginEditing:textField];
     }
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
     if ([self.delegate respondsToSelector:@selector(textFieldDidEndEditing:)]) {
-        [self.delegate performSelector:@selector(textFieldDidEndEditing:) withObject:textField];
+        [self.delegate textFieldDidBeginEditing:textField];
     }
 }
 
@@ -164,35 +163,37 @@ replacementString:(NSString *)string
     NSInteger searchLength = range.location + string.length;
     NSRange colonRange = [newString rangeOfString:@":" options:NSBackwardsSearch range:NSMakeRange(0, searchLength)];
     NSRange spaceRange = [newString rangeOfString:@" " options:NSBackwardsSearch range:NSMakeRange(0, searchLength)];
-    if (colonRange.location == NSNotFound) {
-        [self disappear];
-    } else if (spaceRange.location == NSNotFound || colonRange.location > spaceRange.location) {
-        NSRange searchRange = NSMakeRange(colonRange.location + 1, newString.length - colonRange.location - 1);
-        NSRange spaceRange = [newString rangeOfString:@" " options:NSCaseInsensitiveSearch range:searchRange];
-        NSString *searchText;
-        if (spaceRange.location == NSNotFound) {
-            searchText = [newString substringFromIndex:colonRange.location + 1];
-        } else {
-            NSRange stringRange = NSMakeRange(colonRange.location + 1, spaceRange.location - colonRange.location - 1);
-            searchText = [newString substringWithRange:stringRange];
-        }
-        self.currentSearchRange = NSMakeRange(colonRange.location + 1, searchText.length);
-        [self searchWithText:searchText];
+    if (colonRange.location != NSNotFound && (spaceRange.location == NSNotFound ||  colonRange.location > spaceRange.location)) {
+        [self searchWithColonLocation:colonRange.location string:newString];
     } else {
         [self disappear];
     }
+
     if ([self.delegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
-        return [self.delegate performSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)
-                                   withObject:textField];
+        return [self.delegate textField:textField shouldChangeCharactersInRange:range replacementString:string];
     } else {
         return YES;
     }
 }
 
+- (void)searchWithColonLocation:(NSUInteger)colonLocation string:(NSString *)string
+{
+    NSRange searchRange = NSMakeRange(colonLocation + 1, string.length - colonLocation - 1);
+    NSRange spaceRange = [string rangeOfString:@" " options:NSCaseInsensitiveSearch range:searchRange];
+    NSString *searchText;
+    if (spaceRange.location == NSNotFound) {
+        searchText = [string substringFromIndex:colonLocation + 1];
+    } else {
+        searchText = [string substringWithRange:NSMakeRange(colonLocation + 1, spaceRange.location - colonLocation - 1)];
+    }
+    self.currentSearchRange = NSMakeRange(colonLocation + 1, searchText.length);
+    [self searchWithText:searchText];
+}
+
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
     if ([self.delegate respondsToSelector:@selector(textFieldShouldBeginEditing:)]) {
-        return [self.delegate performSelector:@selector(textFieldShouldBeginEditing:) withObject:textField];
+        return [self.delegate textFieldShouldBeginEditing:textField];
     } else {
         return YES;
     }
@@ -201,7 +202,7 @@ replacementString:(NSString *)string
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
     if ([self.delegate respondsToSelector:@selector(textFieldShouldClear:)]) {
-        return [self.delegate performSelector:@selector(textFieldShouldClear:) withObject:textField];
+        return [self.delegate textFieldShouldClear:textField];
     } else {
         return YES;
     }
@@ -210,7 +211,7 @@ replacementString:(NSString *)string
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField
 {
     if ([self.delegate respondsToSelector:@selector(textFieldShouldEndEditing:)]) {
-        return [self.delegate performSelector:@selector(textFieldShouldEndEditing:) withObject:textField];
+        return [self.delegate textFieldShouldEndEditing:textField];
     } else {
         return YES;
     }
@@ -219,7 +220,7 @@ replacementString:(NSString *)string
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if ([self.delegate respondsToSelector:@selector(textFieldShouldReturn:)]) {
-        return [self.delegate performSelector:@selector(textFieldShouldReturn:) withObject:textField];
+        return [self.delegate textFieldShouldReturn:textField];
     } else {
         return YES;
     }
