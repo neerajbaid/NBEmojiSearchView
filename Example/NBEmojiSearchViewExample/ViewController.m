@@ -16,12 +16,6 @@
 
     [self.view addSubview:self.emojiSearchView];
     [self registerForKeyboardNotifications];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-
     [self.textField becomeFirstResponder];
 }
 
