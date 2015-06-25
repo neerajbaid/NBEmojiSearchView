@@ -7,7 +7,7 @@
 @property (nonatomic, strong) UITextField *textField;
 @property (nonatomic, strong) UIView *dividerView;
 
-@property (nonatomic, strong) id<UITextFieldDelegate> delegate;
+@property (nonatomic, strong) id<UITextFieldDelegate> textFieldDelegate;
 @property (nonatomic, strong) NBEmojiManager *manager;
 @property (nonatomic) NSRange currentSearchRange;
 
@@ -44,7 +44,7 @@
 
 - (void)installOnTextField:(UITextField *)textField
 {
-    self.delegate = textField.delegate;
+    self.textFieldDelegate = textField.delegate;
     self.textField = textField;
     self.textField.delegate = self;
 }
@@ -89,14 +89,26 @@
 
 - (void)appear
 {
+    if ([self.delegate respondsToSelector:@selector(emojiSearchViewWillAppear:)]) {
+        [self.delegate emojiSearchViewWillAppear:self];
+    }
     self.alpha = 1.0;
+    if ([self.delegate respondsToSelector:@selector(emojiSearchViewDidAppear:)]) {
+        [self.delegate emojiSearchViewDidAppear:self];
+    }
 }
 
 - (void)disappear
 {
+    if ([self.delegate respondsToSelector:@selector(emojiSearchViewWillDisappear:)]) {
+        [self.delegate emojiSearchViewWillAppear:self];
+    }
+    self.alpha = 0.0;
+    if ([self.delegate respondsToSelector:@selector(emojiSearchViewDidDisappear:)]) {
+        [self.delegate emojiSearchViewDidAppear:self];
+    }
     [self.manager clear];
     self.currentSearchRange = NSMakeRange(0, 0);
-    self.alpha = 0.0;
 }
 
 #pragma mark - UITableView(DataSource|Delegate)
@@ -143,15 +155,15 @@
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    if ([self.delegate respondsToSelector:@selector(textFieldDidBeginEditing:)]) {
-        [self.delegate textFieldDidBeginEditing:textField];
+    if ([self.textFieldDelegate respondsToSelector:@selector(textFieldDidBeginEditing:)]) {
+        [self.textFieldDelegate textFieldDidBeginEditing:textField];
     }
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-    if ([self.delegate respondsToSelector:@selector(textFieldDidEndEditing:)]) {
-        [self.delegate textFieldDidBeginEditing:textField];
+    if ([self.textFieldDelegate respondsToSelector:@selector(textFieldDidEndEditing:)]) {
+        [self.textFieldDelegate textFieldDidBeginEditing:textField];
     }
 }
 
@@ -169,8 +181,8 @@ replacementString:(NSString *)string
         [self disappear];
     }
 
-    if ([self.delegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
-        return [self.delegate textField:textField shouldChangeCharactersInRange:range replacementString:string];
+    if ([self.textFieldDelegate respondsToSelector:@selector(textField:shouldChangeCharactersInRange:replacementString:)]) {
+        return [self.textFieldDelegate textField:textField shouldChangeCharactersInRange:range replacementString:string];
     } else {
         return YES;
     }
@@ -192,8 +204,8 @@ replacementString:(NSString *)string
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField
 {
-    if ([self.delegate respondsToSelector:@selector(textFieldShouldBeginEditing:)]) {
-        return [self.delegate textFieldShouldBeginEditing:textField];
+    if ([self.textFieldDelegate respondsToSelector:@selector(textFieldShouldBeginEditing:)]) {
+        return [self.textFieldDelegate textFieldShouldBeginEditing:textField];
     } else {
         return YES;
     }
@@ -201,8 +213,8 @@ replacementString:(NSString *)string
 
 - (BOOL)textFieldShouldClear:(UITextField *)textField
 {
-    if ([self.delegate respondsToSelector:@selector(textFieldShouldClear:)]) {
-        return [self.delegate textFieldShouldClear:textField];
+    if ([self.textFieldDelegate respondsToSelector:@selector(textFieldShouldClear:)]) {
+        return [self.textFieldDelegate textFieldShouldClear:textField];
     } else {
         return YES;
     }
@@ -210,8 +222,8 @@ replacementString:(NSString *)string
 
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField
 {
-    if ([self.delegate respondsToSelector:@selector(textFieldShouldEndEditing:)]) {
-        return [self.delegate textFieldShouldEndEditing:textField];
+    if ([self.textFieldDelegate respondsToSelector:@selector(textFieldShouldEndEditing:)]) {
+        return [self.textFieldDelegate textFieldShouldEndEditing:textField];
     } else {
         return YES;
     }
@@ -219,8 +231,8 @@ replacementString:(NSString *)string
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-    if ([self.delegate respondsToSelector:@selector(textFieldShouldReturn:)]) {
-        return [self.delegate textFieldShouldReturn:textField];
+    if ([self.textFieldDelegate respondsToSelector:@selector(textFieldShouldReturn:)]) {
+        return [self.textFieldDelegate textFieldShouldReturn:textField];
     } else {
         return YES;
     }
