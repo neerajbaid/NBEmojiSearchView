@@ -33,11 +33,11 @@
 - (void)searchWithText:(NSString *)searchText
 {
     [self.manager searchWithText:searchText];
-    if ([self.manager numberOfSearchResults] == 0) {
-        [self disappear];
-    } else {
+    if ([self.manager numberOfSearchResults]) {
         [self.tableView reloadData];
         [self appear];
+    } else {
+        [self disappear];
     }
 }
 
