@@ -128,7 +128,7 @@
 - (void)disappear
 {
     if ([self.delegate respondsToSelector:@selector(emojiSearchViewWillDisappear:)]) {
-        [self.delegate emojiSearchViewWillAppear:self];
+        [self.delegate emojiSearchViewWillDisappear:self];
     }
     if (self.disappearAnimationBlock) {
         self.disappearAnimationBlock();
@@ -141,7 +141,7 @@
 - (void)disappearAnimationDidFinish
 {
     if ([self.delegate respondsToSelector:@selector(emojiSearchViewDidDisappear:)]) {
-        [self.delegate emojiSearchViewDidAppear:self];
+        [self.delegate emojiSearchViewDidDisappear:self];
     }
     [self.manager clear];
     self.currentSearchRange = NSMakeRange(0, 0);
