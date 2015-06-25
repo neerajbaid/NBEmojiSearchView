@@ -20,7 +20,6 @@
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, weak) id<NBEmojiSearchViewDelegate> delegate;
 
-@property (nonatomic) CGFloat rowHeight;
 @property (nonatomic, strong) NSString *headerTitle;
 @property (nonatomic, strong) UIFont *font;
 @property (nonatomic, strong) UIColor *textColor;

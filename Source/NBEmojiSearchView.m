@@ -19,12 +19,11 @@
 {
     self = [super init];
     if (self) {
-        [self addSubview:self.tableView];
-        [self addSubview:self.dividerView];
-        self.rowHeight = 44.0;
         self.alpha = 0.0;
         self.font = [UIFont systemFontOfSize:17.0];
         self.textColor = [UIColor darkTextColor];
+        [self addSubview:self.tableView];
+        [self addSubview:self.dividerView];
     }
     return self;
 }
@@ -71,6 +70,7 @@
         [_tableView registerClass:[NBEmojiSearchResultTableViewCell class]
            forCellReuseIdentifier:NSStringFromClass([NBEmojiSearchResultTableViewCell class])];
         _tableView.showsVerticalScrollIndicator = NO;
+        _tableView.rowHeight = 44.0;
     }
     return _tableView;
 }
@@ -83,6 +83,24 @@
         _dividerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     }
     return _dividerView;
+}
+
+- (void)setFont:(UIFont *)font
+{
+    _font = font;
+    [self.tableView reloadData];
+}
+
+- (void)setTextColor:(UIColor *)textColor
+{
+    _textColor = textColor;
+    [self.tableView reloadData];
+}
+
+- (void)setHeaderTitle:(NSString *)headerTitle
+{
+    _headerTitle = headerTitle;
+    [self.tableView reloadData];
 }
 
 #pragma mark - Appearance/Disappearance
@@ -156,11 +174,6 @@
                                                                        withString:replacementString];
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self disappear];
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return self.rowHeight;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
