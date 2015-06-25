@@ -26,17 +26,21 @@
         _emojiSearchView.frame = CGRectMake(0, 46.0, self.view.frame.size.width, self.view.frame.size.height - 46.0);
         [_emojiSearchView installOnTextField:self.textField];
         __weak typeof(self) weakSelf = self;
+        // Appear animation customization
         _emojiSearchView.appearAnimationBlock = ^{
             [UIView animateWithDuration:0.2 animations:^{
                 weakSelf.emojiSearchView.alpha = 1.0;
             } completion:^(BOOL finished) {
+                // Make sure you call appearAnimationDidFinish if you customize the appear animation!
                 [weakSelf.emojiSearchView appearAnimationDidFinish];
             }];
         };
+        // Disappear animation customization
         _emojiSearchView.disappearAnimationBlock = ^{
             [UIView animateWithDuration:0.2 animations:^{
                 weakSelf.emojiSearchView.alpha = 0.0;
             } completion:^(BOOL finished) {
+                // Make sure you call disappearAnimationDidFinish if you customize the disappear animation!
                 [weakSelf.emojiSearchView disappearAnimationDidFinish];
             }];
         };
