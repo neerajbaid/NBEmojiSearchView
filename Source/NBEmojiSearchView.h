@@ -25,6 +25,16 @@
 @property (nonatomic, strong) UIFont *font;
 @property (nonatomic, strong) UIColor *textColor;
 
+// If you choose to customize the emoji view's appear animation, you MUST call
+// appearAnimationDidFinish when your animation is complete.
+@property (nonatomic, copy) void (^appearAnimationBlock)();
+- (void)appearAnimationDidFinish;
+
+// If you choose to customize the emoji view's disappear animation, you MUST call
+// disappearAnimationDidFinish when your animation is complete.
+@property (nonatomic, copy) void (^disappearAnimationBlock)();
+- (void)disappearAnimationDidFinish;
+
 - (void)searchWithText:(NSString *)searchText;
 - (void)installOnTextField:(UITextField *)textField;
 

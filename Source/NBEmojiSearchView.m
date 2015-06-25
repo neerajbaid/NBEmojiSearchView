@@ -85,14 +85,23 @@
     return _dividerView;
 }
 
-#pragma mark - View
+#pragma mark - Appearance/Disappearance
 
 - (void)appear
 {
     if ([self.delegate respondsToSelector:@selector(emojiSearchViewWillAppear:)]) {
         [self.delegate emojiSearchViewWillAppear:self];
     }
-    self.alpha = 1.0;
+    if (self.appearAnimationBlock) {
+        self.appearAnimationBlock();
+    } else {
+        self.alpha = 1.0;
+        [self appearAnimationDidFinish];
+    }
+}
+
+- (void)appearAnimationDidFinish
+{
     if ([self.delegate respondsToSelector:@selector(emojiSearchViewDidAppear:)]) {
         [self.delegate emojiSearchViewDidAppear:self];
     }
@@ -103,12 +112,22 @@
     if ([self.delegate respondsToSelector:@selector(emojiSearchViewWillDisappear:)]) {
         [self.delegate emojiSearchViewWillAppear:self];
     }
-    self.alpha = 0.0;
+    if (self.disappearAnimationBlock) {
+        self.disappearAnimationBlock();
+    } else {
+        self.alpha = 0.0;
+        [self disappearAnimationDidFinish];
+    }
+}
+
+- (void)disappearAnimationDidFinish
+{
     if ([self.delegate respondsToSelector:@selector(emojiSearchViewDidDisappear:)]) {
         [self.delegate emojiSearchViewDidAppear:self];
     }
     [self.manager clear];
     self.currentSearchRange = NSMakeRange(0, 0);
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableView(DataSource|Delegate)
@@ -135,10 +154,8 @@
     NSRange extendedRange = NSMakeRange(self.currentSearchRange.location - 1, self.currentSearchRange.length + 1);
     self.textField.text = [self.textField.text stringByReplacingCharactersInRange:extendedRange
                                                                        withString:replacementString];
-    [self disappear];
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
-    [self.manager clear];
-    [self.tableView reloadData];
+    [self disappear];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -175,7 +192,7 @@ replacementString:(NSString *)string
     NSInteger searchLength = range.location + string.length;
     NSRange colonRange = [newString rangeOfString:@":" options:NSBackwardsSearch range:NSMakeRange(0, searchLength)];
     NSRange spaceRange = [newString rangeOfString:@" " options:NSBackwardsSearch range:NSMakeRange(0, searchLength)];
-    if (colonRange.location != NSNotFound && (spaceRange.location == NSNotFound ||  colonRange.location > spaceRange.location)) {
+    if (colonRange.location != NSNotFound && (spaceRange.location == NSNotFound || colonRange.location > spaceRange.location)) {
         [self searchWithColonLocation:colonRange.location string:newString];
     } else {
         [self disappear];
