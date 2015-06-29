@@ -1,6 +1,6 @@
 NBEmojiSearchView
 ====================
-This view makes it easy to integrate a searchable emoji dropdown into your iOS app in just a few lines.
+Integrate a searchable emoji dropdown into your iOS app in just a few lines.
 
 ![](screencast.gif)
 
