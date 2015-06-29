@@ -21,7 +21,7 @@ Instantiate an `NBEmojiSearchView`, then install it on a `UITextField` as shown 
 NBEmojiSearchView *emojiSearchView = [[NBEmojiSearchView alloc] init];
 [emojiSearchView installOnTextField:textField];
 ```
-You control sizing and placement of the `searchView`. The `searchView` will appear and disappear at the appropriate times automatically.
+You control sizing and placement of the `emojiSearchView`. The `emojiSearchView` will appear and disappear at the appropriate times automatically.
 
 ###Customization
 
@@ -32,7 +32,7 @@ The `UITableView` that displays results is exposed.
 
 #### Animation
 
-The appearance and disappearance animations. Set these blocks with custom animations you'd like the `searchView` to execute.
+The appearance and disappearance animations. Set these blocks with custom animations you'd like the `emojiSearchView` to execute.
 
 If you choose to customize these the appear or disappear animation, you MUST call `appearAnimationDidFinish` or `disappearAnimationDidFinish` when the animation completes, respectively.
 ```smalltalk
