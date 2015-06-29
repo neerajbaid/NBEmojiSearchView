@@ -34,7 +34,6 @@
 @property (nonatomic, copy) void (^disappearAnimationBlock)();
 - (void)disappearAnimationDidFinish;
 
-- (void)searchWithText:(NSString *)searchText;
 - (void)installOnTextField:(UITextField *)textField;
 
 @end
