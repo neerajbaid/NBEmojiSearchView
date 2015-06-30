@@ -35,5 +35,6 @@
 - (void)disappearAnimationDidFinish;
 
 - (void)installOnTextField:(UITextField *)textField;
+- (void)installOnTextView:(UITextView *)textView;
 
 @end
