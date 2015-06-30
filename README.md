@@ -4,7 +4,7 @@ Integrate a searchable emoji dropdown into your iOS app in just a few lines.
 
 ![](screencast.gif)
 
-To start searching, the user just types a `:`. Then, the `emojiSearchView` will automatically parse text to find the user's search query and display results appropriately. When the user selects an emoji, the `emojiSearchView` will automatically insert it into the correct location in the `textField`.
+To start searching, the user just types a `:`. Then, the `emojiSearchView` will automatically parse text to find the user's search query and display results appropriately. When the user selects an emoji, the `emojiSearchView` will automatically insert it into the correct location in the `textField` or `textView`.
 
 ##Installation
 ###CocoaPods
@@ -18,10 +18,17 @@ pod "NBEmojiSearchView"
 Alternatively, you can just drag the <b>Source</b> folder into your project.
 
 ##Usage
-Instantiate an `NBEmojiSearchView`, then install it on a `UITextField` as shown below. 
+Instantiate an `NBEmojiSearchView`, then install it on a `UITextField` or `UITextView` as shown below.
 ```smalltalk
 NBEmojiSearchView *emojiSearchView = [[NBEmojiSearchView alloc] init];
+```
+then
+```smalltalk
 [emojiSearchView installOnTextField:textField];
+```
+or
+```smalltalk
+[emojiSearchView installOnTextView:textView];
 ```
 You control sizing and placement of the `emojiSearchView`. The `emojiSearchView` will appear and disappear at the appropriate times automatically.
 
